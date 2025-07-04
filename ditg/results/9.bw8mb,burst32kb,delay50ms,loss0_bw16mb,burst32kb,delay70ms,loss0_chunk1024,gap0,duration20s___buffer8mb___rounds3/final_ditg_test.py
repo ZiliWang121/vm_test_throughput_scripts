@@ -14,7 +14,7 @@ from collections import defaultdict
 SCHEDULERS = ["default", "roundrobin", "blest", "ecf"]
 TEST_DURATION = 20  # 测试时长（秒）
 # 【修改】：改为16KB块连续发送模式，不设置CBR速率
-BLOCK_SIZE = 400 #1024 #2048  #16384  # 16KB块大小
+BLOCK_SIZE = 1024 #2048  #16384  # 16KB块大小
 N_ROUNDS = 3        # 测试轮数
 RECV_LOG = "/tmp/ditg_recv.log"
 SEND_LOG = "/tmp/ditg_send.log"

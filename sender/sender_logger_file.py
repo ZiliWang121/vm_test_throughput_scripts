@@ -7,11 +7,12 @@ import sys
 
 # Configuration
 #SERVER_IP = "192.168.56.107"     # IP address of the receiver/server
-SERVER_IP = "192.168.56.103" 
+#SERVER_IP = "192.168.56.103"
+SERVER_IP = "10.0.1.10"
 SERVER_PORT = 8888               # Listening port of the receiver
-CHUNK_SIZE = 1024                # Size of each data chunk to send
-#CHUNK_SIZE = 16 * 1024  # 即 16KB
-INTERVAL = 0                     # Interval between sending chunks (in seconds)
+CHUNK_SIZE = 2000                # Size of each data chunk to send
+#CHUNK_SIZE = 32 * 1024  # 即 16KB
+INTERVAL = 0.0001 #0.012 #0.0002 #0                     # Interval between sending chunks (in seconds)
 N_ROUNDS = 3                     # Default number of rounds (can be overridden by command line)
 
 # List of files to send (uncomment if needed)
@@ -19,7 +20,8 @@ FILE_LIST = [
 #    "testfiles/64KB.file",
 #    "testfiles/256KB.file",
 #    "testfiles/8MB.file",
-    "testfiles/64MB.file"
+    "8mb.dat"
+#    "512mb.dat"
 #    "testfiles/256MB.file",
 #    "testfiles/512MB.file"
 ]
@@ -74,7 +76,7 @@ if os.environ.get("SEND_ROUND_FLAG", "true").lower() == "true":
     # Send N_ROUNDS as unsigned int (4 bytes)
     first_conn.sendall(struct.pack("!I", N_ROUNDS))
     first_conn.close()
-    time.sleep(100)  # Wait before starting file transfer (for receiver preparation)
+    time.sleep(20)  # Wait before starting file transfer (for receiver preparation)
 
 # Main loop: send each file N_ROUNDS times
 for file_path in FILE_LIST:
@@ -92,4 +94,4 @@ for file_path in FILE_LIST:
             print(f"[Error] Failed to send file: {file_path} (Round {round_id})")
         else:
             print(f"[Client] Sent {num_chunks} chunks.")
-        time.sleep(100)  # Sleep between rounds to ensure clean start
+        time.sleep(50)  # Sleep between rounds to ensure clean start

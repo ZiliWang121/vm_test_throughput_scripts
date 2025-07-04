@@ -72,19 +72,14 @@ def simple_dual_link_shared_switch():
     # 清除旧设置
     sta1.cmd('tc qdisc del dev sta1-eth0 root || true')
     sta1.cmd('tc qdisc del dev sta1-eth1 root || true')
+
+    # 5G
+    sta1.cmd('tc qdisc add dev sta1-eth0 root handle 1: tbf rate 30mbit burst 32kbit latency 100ms')
+    sta1.cmd('tc qdisc add dev sta1-eth0 parent 1:1 handle 10: netem delay 25ms 2ms distribution normal')
     
-    # === 模拟 5G 上行链路 ===
-    #print("sta1-eth0: 模拟 5G 上行 — 50Mbps, 延迟低，丢包小")
-    #sta1.cmd('tc qdisc add dev sta1-eth0 root handle 1:0 tbf rate 16mbit latency 70ms burst 1540b') # burst 1540')
-    #sta1.cmd('tc qdisc add dev sta1-eth0 parent 1:0 handle 10:0 netem delay 70ms') #loss 0.05%')
-    sta1.cmd('tc qdisc add dev sta1-eth0 root handle 1: tbf rate 16mbit burst 32kbit latency 70ms')
-    sta1.cmd('tc qdisc add dev sta1-eth0 parent 1:1 handle 10: netem delay 70ms')
-    # === 模拟 Wi-Fi 上行链路 ===
-    #print("sta1-eth1: 模拟 Wi-Fi 上行 — 20Mbps, 延迟高，丢包明显")
-    sta1.cmd('tc qdisc add dev sta1-eth1 root handle 1: tbf rate 8mbit burst 32kbit latency 50ms') # burst 1540')
-    sta1.cmd('tc qdisc add dev sta1-eth1 parent 1:1 handle 10: netem delay 50ms') # loss 2%')
-    #sta1.cmd('tc qdisc add dev sta1-eth1 root handle 1:0 tbf rate 8mbit latency 50ms burst 1540b') # burst 1540')
-    #sta1.cmd('tc qdisc add dev sta1-eth1 parent 1:0 handle 10:0 netem delay 50ms') # loss 2%')
+    # Wi-Fi
+    sta1.cmd('tc qdisc add dev sta1-eth1 root handle 1: tbf rate 100mbit burst 32kbit latency 100ms')
+    sta1.cmd('tc qdisc add dev sta1-eth1 parent 1:1 handle 10: netem delay 10ms 3ms distribution normal loss 1.5%')
     print("=== 极端异构环境配置完成 ===")
     print("WiFi路径(eth0): 8Mbps,  50ms RTT")
     print("LTE路径(eth1):  16Mbps, 270ms RTT") 

@@ -16,12 +16,12 @@ import mpsched
 # ------------------- Configuration -------------------
 LISTEN_IP = "0.0.0.0"
 LISTEN_PORT = 8888
-#CHUNK_SIZE = 32 * 1024  # 即 16KB
-CHUNK_SIZE = 2000
-#SCHEDULER_LIST = ["ecf"]
+#CHUNK_SIZE = 16 * 1024  # 即 16KB
+CHUNK_SIZE = 1024
+#SCHEDULER_LIST = ["blest", "ecf"]
 SCHEDULER_LIST = ["default", "roundrobin", "blest", "ecf"]
 #FILE_LIST = ["8MB.file", "256MB.file"]
-FILE_LIST = ["8mb.dat"]
+FILE_LIST = ["64mb.dat"]
 CSV_LOG = "recv_log.csv"
 CSV_SUMMARY = "summary.csv"
 
@@ -88,7 +88,7 @@ csvwriter = csv.writer(csvfile)
 if not file_exists:
     csvwriter.writerow([
         "Scheduler", "File", "Round", "NumChunks", "AvgDelay(ms)",
-        "Goodput(Mbps)", "DownloadTime(s)", "OFO_5G", "OFO_WiFi"
+        "Goodput(KB/s)", "DownloadTime(s)", "OFO_5G", "OFO_WiFi"
     ])
 
 # Main loop
@@ -156,7 +156,7 @@ for task_index, (sched, fname, round_id) in enumerate(expected_tasks, 1):
     end_time = time.time()
     duration = end_time - start_time
     avg_delay = delay_sum / chunk_count if chunk_count > 0 else 0
-    goodput = (recv_bytes * 8) / (duration * 1024 * 1024) if duration > 0 else 0
+    goodput = (recv_bytes / 1024) / duration if duration > 0 else 0
 
     if chunk_count == 0:
         print(f"[Error] No data received: {sched}-{fname} Round {round_id}")
@@ -174,7 +174,7 @@ for task_index, (sched, fname, round_id) in enumerate(expected_tasks, 1):
     })
 
     print(f"[Result] {sched} | {fname} (Round {round_id}): Delay = {avg_delay:.2f} ms | "
-          f"Goodput = {goodput:.2f} Mbps | Time = {duration:.2f} s | OFO_5G = {ofo_5g} | OFO_WiFi = {ofo_wifi}")
+          f"Goodput = {goodput:.2f} KB/s | Time = {duration:.2f} s | OFO_5G = {ofo_5g} | OFO_WiFi = {ofo_wifi}")
 
 csvfile.close()
 sock.close()
@@ -184,7 +184,7 @@ with open(CSV_SUMMARY, "w", newline='') as summary:
     writer = csv.writer(summary)
     writer.writerow([
         "Scheduler", "File", "AvgChunks", "AvgDelay(ms)",
-        "AvgGoodput(Mbps)", "AvgDownloadTime(s)"
+        "AvgGoodput(KB/s)", "AvgDownloadTime(s)"
     ])
     for sched in SCHEDULER_LIST:
         for fname in FILE_LIST:
